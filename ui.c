@@ -19,7 +19,6 @@ int	username_valid(char username[]){
           if (username[i] >= 'A' && username[i] <= 'Z') continue;
           if (username[i] >= '0' && username[i] <= '9') continue;
           if (username[i] == 0) break;
-          printf("Illegal char in username %c  A-Z a-z 0-9 allowed", username[i]);
           return -1;
 	}
         return 0;

@@ -69,6 +69,7 @@ int  main(){
 
 
 #ifdef TEST
+	printf("\n");
         if (strcmp(test_username, username) == 0)
 		printf ("Username - Ok\n");
 	else
