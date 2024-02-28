@@ -2,6 +2,14 @@
 #include <time.h>
 #include <stdlib.h>
 #include <string.h>
+#include "crypt.h"
+
+#define CBC 1
+#define CTR 1
+#define ECB 1
+
+#include "aes.h"
+
 
 void init_random(){
     srand(time(NULL));
@@ -29,5 +37,30 @@ void make_entry(unsigned char result[], char username[], char password[], int us
 
 }
 
+void get_entry_values(unsigned char entry[], char username[], char password[], int username_len, int password_len){
+    UNUSED(password_len);
+
+    char* temp = (char*) entry + username_len;
+
+    strcpy(username, (char*) entry);
+    strcpy(password, temp);
+}
+
+
+
+void encrypt_aes(unsigned char key[], unsigned char result[]){
+        struct AES_ctx ctx;
+
+        AES_init_ctx(&ctx, key);
+        AES_ECB_encrypt(&ctx, result);
+}
+
+
+void decrypt_aes(unsigned char key[], unsigned char result[]){
+        struct AES_ctx ctx;
+
+        AES_init_ctx(&ctx, key);
+        AES_ECB_decrypt(&ctx, result);
+}
 
 
