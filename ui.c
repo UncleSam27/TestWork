@@ -4,7 +4,10 @@
 #include "ui.h"
 #include "crypt.h"
 
-void    clear_sacnf_buffer(){
+
+#define MAX_FORMAT_LEN 16
+
+void    clear_input_buffer(){
 	scanf("%*[^\n]");
 	scanf("%*c");
 }
@@ -15,7 +18,7 @@ int	username_valid(char username[]){
         int username_len = strlen(username);
 
 	if(username_len >= MAX_USERNAME_LEN-1){
-          clear_sacnf_buffer();
+          clear_input_buffer();
           return -1;
         }
 
@@ -65,19 +68,31 @@ int	passwd_valid(char pass[]){
 }
 
 
+void   remove_newline(char * buffer){
+	char* temp_ptr;
+	temp_ptr = strchr (buffer,'\r');
+	if(temp_ptr)
+		*temp_ptr = 0;
+
+        temp_ptr = strchr (buffer,'\n');
+        if(temp_ptr)
+                *temp_ptr = 0;
+}
+
+
+
+
+
 void	get_username(char username[]){
-        char format[16];
-        sprintf(format, "%%%ds", MAX_USERNAME_LEN-1);
-        printf("format string: \"%s\"\n",format);
 	while( 1 ){
 		printf("Enter username: ");
-                scanf(format, username);
+                fgets(username, MAX_USERNAME_LEN, stdin);
+                remove_newline(username);
         	if( username_valid( username ) == 0 ){
                     printf("Good name.\n");
                     break;
                 }
                 printf("Name too long, or illegal char in username, A-Z a-z 0-9 allowed\n");
-                username[0] = 0;
 	}
 }
 
