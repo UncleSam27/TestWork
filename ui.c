@@ -4,12 +4,20 @@
 #include "ui.h"
 #include "crypt.h"
 
+void    clear_sacnf_buffer(){
+	scanf("%*[^\n]");
+	scanf("%*c");
+}
+
+
 int	username_valid(char username[]){
 
         int username_len = strlen(username);
 
-	if(username_len >= MAX_USERNAME_LEN-1)
+	if(username_len >= MAX_USERNAME_LEN-1){
+          clear_sacnf_buffer();
           return -1;
+        }
 
         if(username_len == 0 )  //username must contain 1 char. min
           return -1;
@@ -58,20 +66,22 @@ int	passwd_valid(char pass[]){
 
 
 void	get_username(char username[]){
-
-	username[0] = 0;
+        char format[16];
+        sprintf(format, "%%%ds", MAX_USERNAME_LEN-1);
+        printf("format string: \"%s\"\n",format);
 	while( 1 ){
 		printf("Enter username: ");
-		scanf("%62[^\n]", username);
+                scanf(format, username);
         	if( username_valid( username ) == 0 ){
                     printf("Good name.\n");
                     break;
                 }
-                printf("Illegal char in username, A-Z a-z 0-9 allowed");
+                printf("Name too long, or illegal char in username, A-Z a-z 0-9 allowed\n");
+                username[0] = 0;
 	}
 }
 
-void	get_password(char password[] ){
+void	get_password(char* password ){
         char* newpass;
 
         while( 1 ){

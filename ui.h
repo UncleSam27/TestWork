@@ -14,7 +14,7 @@
 int	username_valid(char string[]);
 int	passwd_valid(char pass[]);
 void	get_username(char username[]);
-void	get_password(char password[] );
+void	get_password(char* password );
 void    print_hex(unsigned char key[], int len);
 
 #endif /*  __UI_H_ */
