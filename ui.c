@@ -117,6 +117,18 @@ void	get_password(char* password ){
 }
 
 
+int     get_keylen(){
+	while(1){      // переделать на fgets
+		printf("Select key lenght: \n1 - 256bit \n2 - 192bit \n3 - 128bit\n");
+		char ch=getchar();   
+		if(ch == '1') return 256;
+		if(ch == '2') return 192;
+		if(ch == '3') return 128;
+		printf("Only 1,2,3 allowed\n");
+		clear_input_buffer();
+
+	}
+}
 
 void    print_hex(unsigned char key[], int len){
 	

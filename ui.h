@@ -13,6 +13,7 @@
 
 int	username_valid(char string[]);
 int	passwd_valid(char pass[]);
+int	get_keylen();
 void	get_username(char username[]);
 void	get_password(char* password );
 void    print_hex(unsigned char key[], int len);

@@ -2,6 +2,7 @@
 #include <time.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
 #include "crypt.h"
 
 #define CBC 1
@@ -48,18 +49,18 @@ void get_entry_values(unsigned char entry[], char username[], char password[], i
 
 
 
-void encrypt_aes(unsigned char key[], unsigned char result[]){
+void encrypt_aes(unsigned char key[], unsigned char result[], uint16_t KeyLen){
         struct AES_ctx ctx;
 
-        AES_init_ctx(&ctx, key);
+        AES_init_ctx(&ctx, key, KeyLen);
         AES_ECB_encrypt(&ctx, result);
 }
 
 
-void decrypt_aes(unsigned char key[], unsigned char result[]){
+void decrypt_aes(unsigned char key[], unsigned char result[], uint16_t KeyLen){
         struct AES_ctx ctx;
 
-        AES_init_ctx(&ctx, key);
+        AES_init_ctx(&ctx, key, KeyLen);
         AES_ECB_decrypt(&ctx, result);
 }
 

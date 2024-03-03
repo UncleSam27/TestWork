@@ -19,25 +19,27 @@ int  main(){
 
 	unsigned char result[MAX_PASSWORD_LEN+MAX_USERNAME_LEN];
 	unsigned char key[MAX_KEY_LEN];
+	uint16_t KeyLen;
 
         init_random();
-
 	get_username( username );
 	get_password( password );
+        KeyLen = get_keylen();
 
 
 #ifdef TEST
         printf ("Login: %s\n", username);
         printf ("Passwd: %s\n",password);
+	printf ("Key len: %d\n", KeyLen);
 
         //make backup for test
 	strcpy(test_username, username);
 	strcpy(test_password, password);
 #endif
 
-	generate_key(key, MAX_KEY_LEN);
+	generate_key(key, KeyLen/8); 
         printf("\nKey\n");
-        print_hex(key, MAX_KEY_LEN);
+        print_hex(key, KeyLen/8);
 
 	//make user:password entry
         make_entry(result, username, password, MAX_USERNAME_LEN, MAX_PASSWORD_LEN);
@@ -50,14 +52,14 @@ int  main(){
         memset(password, 0, sizeof(password));
 
         printf("AES encrypt...\n");
-        encrypt_aes(key, result);
+        encrypt_aes(key, result,  KeyLen);
 
 	printf("\nEncrypted entry\n");
 	print_hex(result, MAX_PASSWORD_LEN+MAX_USERNAME_LEN);
 
 
         printf("AES decrypt...\n");
-        decrypt_aes(key, result);
+        decrypt_aes(key, result, KeyLen);
 
         printf("\nDecrypted entry\n");
         print_hex(result, MAX_PASSWORD_LEN+MAX_USERNAME_LEN);

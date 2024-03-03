@@ -16,16 +16,6 @@ Block size can be chosen in aes.h - available choices are AES128, AES192, AES256
 // The number of columns comprising a state in AES. This is a constant in AES. Value=4
 #define Nb 4
 
-#if defined(AES256) && (AES256 == 1)
-    #define Nk 8
-    #define Nr 14
-#elif defined(AES192) && (AES192 == 1)
-    #define Nk 6
-    #define Nr 12
-#else
-    #define Nk 4        // The number of 32 bit words in a key.
-    #define Nr 10       // The number of rounds in AES Cipher.
-#endif
 
 // jcallan@github points out that declaring Multiply as a function 
 // reduces code size considerably with the Keil ARM compiler.
@@ -34,8 +24,11 @@ Block size can be chosen in aes.h - available choices are AES128, AES192, AES256
   #define MULTIPLY_AS_A_FUNCTION 0
 #endif
 
-
-
+// ------------------ fast lib fix --------------------
+uint8_t 	Nk;
+uint8_t 	Nr;
+uint8_t		AES_KEYLEN;
+uint16_t	AES_keyExpSize;
 
 /*****************************************************************************/
 /* Private variables:                                                        */
@@ -117,7 +110,8 @@ static uint8_t getSBoxValue(uint8_t num)
 // This function produces Nb(Nr+1) round keys. The round keys are used in each round to decrypt the states. 
 static void KeyExpansion(uint8_t* RoundKey, const uint8_t* Key)
 {
-  unsigned i, j, k;
+  //unsigned i, j, k;
+  int i,j,k;
   uint8_t tempa[4]; // Used for the column/row operations
   
   // The first round key is the key itself.
@@ -168,9 +162,10 @@ static void KeyExpansion(uint8_t* RoundKey, const uint8_t* Key)
 
       tempa[0] = tempa[0] ^ Rcon[i/Nk];
     }
-#if defined(AES256) && (AES256 == 1)
-    if (i % Nk == 4)
+    if(Nk == 8)    //AES256
     {
+     if (i % Nk == 4)
+     {
       // Function Subword()
       {
         tempa[0] = getSBoxValue(tempa[0]);
@@ -178,8 +173,8 @@ static void KeyExpansion(uint8_t* RoundKey, const uint8_t* Key)
         tempa[2] = getSBoxValue(tempa[2]);
         tempa[3] = getSBoxValue(tempa[3]);
       }
+     }
     }
-#endif
     j = i * 4; k=(i - Nk) * 4;
     RoundKey[j + 0] = RoundKey[k + 0] ^ tempa[0];
     RoundKey[j + 1] = RoundKey[k + 1] ^ tempa[1];
@@ -188,16 +183,41 @@ static void KeyExpansion(uint8_t* RoundKey, const uint8_t* Key)
   }
 }
 
-void AES_init_ctx(struct AES_ctx* ctx, const uint8_t* key)
+void Set_Key_Var(uint16_t KeyLen)
 {
-  KeyExpansion(ctx->RoundKey, key);
+      if(KeyLen == 256){        //AES256
+        AES_KEYLEN = 32;
+        AES_keyExpSize = 240;
+        Nk = 8;
+        Nr = 14;
+      }else if(KeyLen == 192){  //AES192
+        AES_KEYLEN = 24;
+        AES_keyExpSize = 208;
+        Nk = 6;
+        Nr = 12;
+      }else {                   // AES128
+        AES_KEYLEN = 16;
+        AES_keyExpSize = 176;
+        Nk = 4;
+        Nr = 10;
+      }
+
+
+}
+
+void AES_init_ctx(struct AES_ctx* ctx, const uint8_t* key, uint16_t KeyLen)
+{
+      Set_Key_Var(KeyLen); 
+      KeyExpansion(ctx->RoundKey, key);
 }
 #if (defined(CBC) && (CBC == 1)) || (defined(CTR) && (CTR == 1))
-void AES_init_ctx_iv(struct AES_ctx* ctx, const uint8_t* key, const uint8_t* iv)
+void AES_init_ctx_iv(struct AES_ctx* ctx, const uint8_t* key, const uint8_t* iv, uint16_t KeyLen)
 {
+  Set_Key_Var(KeyLen);
   KeyExpansion(ctx->RoundKey, key);
   memcpy (ctx->Iv, iv, AES_BLOCKLEN);
 }
+
 void AES_ctx_set_iv(struct AES_ctx* ctx, const uint8_t* iv)
 {
   memcpy (ctx->Iv, iv, AES_BLOCKLEN);
