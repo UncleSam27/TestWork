@@ -6,11 +6,31 @@
 
 
 #define MAX_FORMAT_LEN 16
+#define KEY_STR_LEN    1
 
 void    clear_input_buffer(){
 	scanf("%*[^\n]");
 	scanf("%*c");
 }
+
+
+int     key_valid(char key[]){
+
+        int key_len = strlen(key);
+
+        if(key_len > KEY_STR_LEN){
+          clear_input_buffer();
+          return -1;
+        }
+
+        if(key_len == 0 )
+          return -1;
+
+        if (key[0] >= '1' && key[0] <= '3') return 0;
+        
+        return -1;
+}
+
 
 
 int	username_valid(char username[]){
@@ -118,15 +138,17 @@ void	get_password(char* password ){
 
 
 int     get_keylen(){
+	char Temp[KEY_STR_LEN+3];
 	while(1){      // переделать на fgets
 		printf("Select key lenght: \n1 - 256bit \n2 - 192bit \n3 - 128bit\n");
-		char ch=getchar();   
-		if(ch == '1') return 256;
-		if(ch == '2') return 192;
-		if(ch == '3') return 128;
+		fgets(Temp, KEY_STR_LEN+2, stdin);
+		remove_newline(Temp);
+                if( key_valid( Temp ) == 0 ){
+	                if(Temp[0] == '1') return 256;
+        	        if(Temp[0] == '2') return 192;
+	                if(Temp[0] == '3') return 128;
+                }
 		printf("Only 1,2,3 allowed\n");
-		clear_input_buffer();
-
 	}
 }
 
